@@ -4,7 +4,9 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { map, Observable } from 'rxjs';
+import { RESPONSE_MESSAGE_KEY } from '../decorator/response-message.decorator';
 
 export interface Response<T> {
   message: string;
@@ -14,14 +16,20 @@ export interface Response<T> {
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
+  constructor(private reflector: Reflector) {}
+
   intercept(
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> {
+    const message =
+      this.reflector.get<string>(RESPONSE_MESSAGE_KEY, context.getHandler()) ||
+      'Requisição realizada com sucesso';
+
     return next.handle().pipe(
       map((data) => ({
         data: data ?? null,
-        message: ' Requisição realizada com sucesso',
+        message: message,
         success: true,
       })),
     );
