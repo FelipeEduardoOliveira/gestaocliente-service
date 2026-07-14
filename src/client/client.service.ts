@@ -1,54 +1,41 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateClientDto } from './dto/create-client.dto';
 import { Client } from './entities/client.entity';
 import { UpdateClientDto } from './dto/update-client.dto';
 
 @Injectable()
 export class ClientService {
-  private clients: Client[] = [];
+  constructor(
+    @InjectRepository(Client)
+    private readonly clientRepository: Repository<Client>,
+  ) {}
 
-  create(createClientDto: CreateClientDto): Client {
-    const novoCliente: Client = {
-      id: Date.now(),
-      companyName: createClientDto.companyName,
-      email: createClientDto.email,
-      cpf: createClientDto.cpf ?? null,
-      cnpj: createClientDto.cnpj ?? null,
-      phone: createClientDto.phone ?? null,
-      facebook: createClientDto.facebook ?? null,
-      instagram: createClientDto.instagram ?? null,
-      website: createClientDto.website ?? null,
-      status: createClientDto.status,
-      createdAt: new Date(),
-      updateAt: null,
-      removeAt: null,
-    };
-
-    this.clients.push(novoCliente);
-
-    return novoCliente;
+  async create(createClientDto: CreateClientDto): Promise<Client> {
+    const newClient = this.clientRepository.create(createClientDto);
+    return this.clientRepository.save(newClient);
   }
 
-  getAll(): Client[] {
-    return this.clients;
+  async getAll(): Promise<Client[]> {
+    return this.clientRepository.find();
   }
 
-  update(id: number, updateClientDto: UpdateClientDto): Client {
-    const client = this.clients.find((c) => c.id === id);
+  async findOne(id: number): Promise<Client> {
+    const client = await this.clientRepository.findOne({ where: { id } });
 
     if (!client) {
       throw new NotFoundException('Cliente não encontrado');
     }
-    const fieldsClear = Object.fromEntries(
-      Object.entries(updateClientDto).filter(
-        ([_, value]) => value !== undefined,
-      ),
-    );
-
-    Object.assign(client, fieldsClear);
-
-    client.updateAt = new Date();
 
     return client;
+  }
+
+  async update(id: number, updateClientDto: UpdateClientDto): Promise<Client> {
+    const client = await this.findOne(id);
+
+    Object.assign(client, updateClientDto);
+
+    return this.clientRepository.save(client);
   }
 }
