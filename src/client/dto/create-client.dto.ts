@@ -15,7 +15,7 @@ export class CreateClientDto {
   companyName: string;
 
   @IsEmail()
-  @IsNotEmpty({ message: 'O Email da empresa é obrigatório' })
+  @IsOptional()
   email: string;
 
   @IsOptional()
@@ -53,4 +53,21 @@ export class CreateClientDto {
   })
   @IsNotEmpty({ message: 'O Status da empresa é obrigatório' })
   status: ClientStatus;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(2, 2, { message: 'A UF deve conter apenas 2 caracteres' })
+  uf?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  methodAbord?: string;
 }

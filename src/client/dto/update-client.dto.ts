@@ -54,4 +54,21 @@ export class UpdateClientDto extends PartialType(CreateClientDto) {
   })
   @IsOptional()
   status?: ClientStatus;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(2, 2, { message: 'A UF deve conter apenas 2 caracteres' })
+  uf?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  methodAbord?: string;
 }

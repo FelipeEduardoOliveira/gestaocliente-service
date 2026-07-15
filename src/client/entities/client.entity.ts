@@ -52,4 +52,16 @@ export class Client {
 
   @Column({ nullable: true })
   removeAt?: Date;
+
+  @Column({ nullable: true })
+  city?: string;
+
+  @Column({ nullable: true, length: 2 })
+  uf?: string;
+
+  @Column({ nullable: true })
+  description?: string;
+
+  @Column({ nullable: true })
+  methodAbord?: string;
 }
